@@ -1,0 +1,3 @@
+python-tk
+python-pygame
+vk_api
