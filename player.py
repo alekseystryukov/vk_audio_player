@@ -1,5 +1,4 @@
-
-
+import time
 from musicplayer import Player
 from song_sources import OnlineSource, OfflineSource
 from gui import Interface
@@ -25,8 +24,6 @@ else:
         return False
 
     gui.on_credentials_entered = on_credentials_entered
-
-import time
 
 start_time = 0
 while True:
