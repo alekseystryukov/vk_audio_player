@@ -18,7 +18,7 @@ else:
     def on_credentials_entered(login, password):
         if vk_music.login(login, password):
             songs_list = vk_music.get_audios()
-            player.set_songs(player)
+            player.set_songs(songs_list)
             gui.show_player(songs_list, player)
             return True
         return False

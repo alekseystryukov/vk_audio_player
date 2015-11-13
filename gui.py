@@ -27,18 +27,56 @@ class Interface:
                 player.play_by_index(index)
 
         def on_song_change(song):
+            # title
             song_label.set(song.title)
             curr = Lb.curselection()
             if curr:
                 Lb.select_clear(curr[0])
 
+            # song list
             index = songs.index(song)
             Lb.select_set(index)
             Lb.see(index)
             Lb.activate(index)
 
-        player.on_song_change = on_song_change
+            # song progress
+            progress.configure(to=song.duration)
+            print('set song duration: {}'.format(song.duration))
 
+        self.disable_progress_update = False
+
+        def cmd_progress(e):
+            sec = progress.get()
+            print('set progress: {}'.format(sec))
+            player.set_progress(sec)
+            self.disable_progress_update = False
+
+        def cmd_progress_click(e):
+            # disable auto update
+            self.disable_progress_update = True
+
+            # fix default increment
+            # this cause crash program
+            # direct = progress.identify(e.x, e.y)
+            # if direct == 'trough1':
+            #     inc = -1
+            # elif direct == 'trough2':
+            #     inc = 1
+            # else:
+            #     inc = 0
+            # if inc:
+            #     sec = player.inc_progress(inc)
+            #     progress.set(sec)
+
+        def on_play_progress(sec):
+            if not self.disable_progress_update:
+                progress.set(sec)
+                #print('progress: {}'.format(sec))
+
+        player.on_song_change = on_song_change
+        player.on_play_progress = on_play_progress
+
+        self.clear_frame(self.window)
         menu = Frame(self.window, relief=RAISED, pady=6, padx=6)
         song_label = StringVar()
         Label(menu, textvariable=song_label, pady=4).pack()
@@ -50,6 +88,15 @@ class Interface:
 
         volume.pack(side=RIGHT)
         volume.set(100)
+
+        progress = Scale(menu, from_=0, to=100, orient=HORIZONTAL, showvalue=0,
+                         length=300, sliderlength=20)
+
+        progress.bind("<Button-1>", cmd_progress_click)
+        progress.bind("<ButtonRelease-1>", cmd_progress)
+
+        progress.pack(side=BOTTOM, fill=X, expand=1)
+
         menu.pack(fill=X, side=TOP)
 
         frame = Frame(self.window, relief=RAISED, borderwidth=1, height=50)
@@ -71,6 +118,7 @@ class Interface:
             on_song_change(songs[player.current_song_index])
 
     def show_login(self):
+        self.clear_frame(self.window)
         login_frame = Frame(self.window, pady=10, padx=10)
 
         Label(login_frame, text="Username").grid(row=0, sticky=E)
@@ -96,6 +144,12 @@ class Interface:
 
         Button(login_frame, text="Login", command=_login_btn_clicked).grid(columnspan=2)
         login_frame.pack()
+
+    @staticmethod
+    def clear_frame(frame):
+        for widget in frame.winfo_children():
+            Interface.clear_frame(widget)
+            widget.destroy()
 
     def on_credentials_entered(self, login, password):
         pass
