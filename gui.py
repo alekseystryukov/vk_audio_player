@@ -19,7 +19,7 @@ class Interface:
             player.play(-1)
 
         def cmd_volume(vol):
-            player.set_volume(float(vol)/100)
+            player.set_volume(vol)
 
         def cmd_list(event):
             index = Lb.nearest(event.y)
@@ -46,9 +46,9 @@ class Interface:
         self.disable_progress_update = False
 
         def cmd_progress(e):
-            sec = progress.get()
-            print('set progress: {}'.format(sec))
-            player.set_progress(sec)
+            prog = progress.get() / float(progress.cget('to'))
+            print('set progress: {}'.format(prog))
+            player.set_progress(prog)
             self.disable_progress_update = False
 
         def cmd_progress_click(e):
@@ -68,10 +68,9 @@ class Interface:
             #     sec = player.inc_progress(inc)
             #     progress.set(sec)
 
-        def on_play_progress(sec):
+        def on_play_progress(percent):
             if not self.disable_progress_update:
-                progress.set(sec)
-                #print('progress: {}'.format(sec))
+                progress.set(percent * progress.cget('to'))
 
         player.on_song_change = on_song_change
         player.on_play_progress = on_play_progress

@@ -1,10 +1,13 @@
+import vlc
 import pygame
 import urllib
 
+
 class Player:
     def __init__(self, songs):
-        pygame.init()
-        pygame.mixer.init()
+        self.player = vlc.MediaPlayer()
+        # pygame.init()
+        # pygame.mixer.init()
         self.set_songs(songs)
 
     def set_songs(self, songs):
@@ -29,17 +32,20 @@ class Player:
     def _on_song_ends(self):
         self.play(1)
 
-    @staticmethod
-    def _load_source(source):
-        if source.startswith('http'):
-            song_file = urllib.urlopen(source)
-            pygame.mixer.music.load(song_file)
-        else:
-            pygame.mixer.music.load(source)
+    def _load_source(self, source):
+        self.player.set_media(vlc.Media(source))
+        # if source.startswith('http'):
+        #     song_file = urllib.urlopen(source)
+        #     pygame.mixer.music.load(song_file)
+        # else:
+        #     pygame.mixer.music.load(source)
 
     def _play(self, loop=0, start=0.0):
         self.start_offset = start
-        pygame.mixer.music.play(loop, start)
+        #pygame.mixer.music.play(loop, start)
+
+
+        self.player.play()
 
     def on_song_change(self, **kwargs):
         pass
@@ -48,10 +54,11 @@ class Player:
         pass
 
     def play_pause(self):
-        if self.paused:
-            pygame.mixer.music.unpause()
-        else:
-            pygame.mixer.music.pause()
+        self.player.set_pause(int(not self.paused))
+        # if self.paused:
+        #     pygame.mixer.music.unpause()
+        # else:
+        #     pygame.mixer.music.pause()
         self.paused = not self.paused
 
     def play(self, index=0):
@@ -71,13 +78,17 @@ class Player:
         self.on_song_change(song=song)
 
     def set_volume(self, volume):
-        pygame.mixer.music.set_volume(volume)
+        self.player.audio_set_volume(int(volume))
+        #pygame.mixer.music.set_volume(volume)
 
     def _get_current_progress(self):
-        return self.start_offset + pygame.mixer.music.get_pos() / 1000
+        #return self.start_offset + pygame.mixer.music.get_pos() / 1000
+        return self.player.get_position()
 
-    def set_progress(self, sec):
-        self._play(0, float(sec))
+    def set_progress(self, percent):
+        #percent = sec/(self.player.get_length() / 1000.0)
+        self.player.set_position(percent)
+        #self._play(0, float(sec))
 
     # def inc_progress(self, inc):
     #     curr_progress = self._get_current_progress()
@@ -89,7 +100,8 @@ class Player:
 
     def update(self):
         if not self.paused:
-            if not pygame.mixer.music.get_busy():
+            #if not pygame.mixer.music.get_busy():
+            if not self.player.is_playing():
                 self._on_song_ends()
             else:
                 self.on_play_progress(self._get_current_progress())
