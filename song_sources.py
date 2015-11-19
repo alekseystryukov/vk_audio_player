@@ -12,11 +12,11 @@ Song = namedtuple('Song', ['id', 'title', 'source', 'duration'])
 
 
 class OnlineSource:
-
+    config_file = 'vk_config.json'
     def __init__(self):
         self.songs = []
         self.connection = None
-        if os.path.isfile('vk_config.json'):
+        if os.path.isfile(self.config_file):
             with open('vk_config.json', 'r') as conf:
                 data = json.loads(conf.read())
                 if data:
@@ -43,6 +43,14 @@ class OnlineSource:
             else:
                 return True
         return False
+
+    def logout(self):
+        try:
+            os.remove(self.config_file)
+        except OSError:
+            pass
+        self.connection = None
+
 
 
 class OfflineSource:

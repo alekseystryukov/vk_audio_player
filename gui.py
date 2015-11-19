@@ -7,6 +7,7 @@ class Interface:
         self.window = Tk()
         self.window.title("Music Player")
 
+
     def show_player(self, songs, player):
 
         def cmd_play_pause(*args):
@@ -111,6 +112,10 @@ class Interface:
         Lb.bind("<Button-1>", cmd_list)
         Lb.pack(fill=BOTH, expand=1)
 
+        logout_link = Label(frame, text="Logout")
+        logout_link.pack()
+        logout_link.bind("<Button-1>", self.logout)
+
         frame.pack(fill=BOTH, side=BOTTOM, expand=1)
 
         if not player.paused:
@@ -152,6 +157,9 @@ class Interface:
 
     def on_credentials_entered(self, login, password):
         pass
+
+    def logout(self, *args):
+        print(args)
 
     def update(self):
         self.window.update_idletasks()

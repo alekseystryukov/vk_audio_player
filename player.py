@@ -2,12 +2,22 @@ import time
 from musicplayer import Player
 from song_sources import OnlineSource, OfflineSource
 from gui import Interface
+from updater import update
 
+update()
 
 gui = Interface()
 vk_music = OnlineSource()
 
 player = Player(vk_music.songs)
+
+
+def logout(*args):
+    player.stop()
+    vk_music.logout()
+    gui.show_login()
+gui.logout = logout
+
         #or OfflineSource(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')).songs
 if vk_music.songs:
     gui.show_player(vk_music.songs, player)
@@ -24,6 +34,10 @@ else:
         return False
 
     gui.on_credentials_entered = on_credentials_entered
+
+
+
+
 
 start_time = 0
 while True:
